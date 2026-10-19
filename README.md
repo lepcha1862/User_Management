@@ -22,7 +22,7 @@
 | **7. Troubleshooting** | 1 | See below |
 | **8. Conclusion** | 0.5 | 2-3 sentences on what worked / what was learned |
 
-**Section 7 — Troubleshooting (the 0.25-mark one, requires a real diagnosis with commands):**
+**Section 7 — Troubleshooting:**
 
 > **Problem:** `PUT /users/2` returned `200 OK` but the `name` field was unchanged after the request.
 >
