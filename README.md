@@ -37,26 +37,8 @@
 
 **Alternative troubleshooting entry (if you prefer):** the VPA `vpa-tls-certs` secret failure — `kubectl describe pod -n kube-system -l app=vpa-admission-controller` showed `MountVolume.SetUp failed for volume "tls-certs" : secret "vpa-tls-certs" not found`, fixed by generating the cert manually with `openssl` and `kubectl create secret generic`.
 
----
 
-### Demo Q&A crib sheet
-
-**What it does:** Anticipates every question listed in the assignment and gives a concise answer. Memorize the bold line; the rest is context.
-
-| Question | Canned answer |
-|---|---|
-| **Why does a StatefulSet suit a database better than a Deployment?** | **StatefulSet gives stable network identity (`postgres-0`), ordered start/stop, and `volumeClaimTemplates` that bind a unique PVC to each replica.** A Deployment creates anonymous pods with random names and needs a shared (usually RWX) PVC — which our hostpath provisioner doesn't support. |
-| **What would change with a Deployment + one PVC?** | If the Pod was ever moved to another node, the PV couldn't reattach unless the `nodeAffinity` matched; also, only one replica could run at a time (RWO volume). No stable DNS name. No ordered restarts. |
-| **What happens to the PVC when you delete the StatefulSet?** | **The PVC is retained** — that's how StatefulSet enforces data safety. To delete it, you must `kubectl delete pvc data-postgres-0` explicitly. This is why we could safely delete and recreate the StatefulSet during development. |
-| **If `postgres-0` is restarted, what happens to the api Pods?** | **They fail readiness.** `/ready` does `SELECT 1`; when Postgres is unreachable, all api pods return 503 from readiness → they're removed from `api` Service endpoints → Ingress has no backend → clients see 503. They auto-recover when Postgres returns. |
-| **Why does the HPA need CPU requests?** | **The HPA target is a *percentage of the request*, not an absolute value.** Without `resources.requests.cpu: 100m`, the HPA cannot compute utilisation and refuses to scale (it reports `<unknown>/50%`). Requests are also what the scheduler uses to pick nodes. |
-| **Where does traffic enter the cluster, and which object decides which Service receives it?** | **Entry point = the ingress-nginx controller** (exposed on `127.0.0.1:80` by `minikube tunnel`). The **`Ingress` object** (`usermgmt-ingress`) matches the `Host:` header against its `rules[].host` and forwards to `service.api:80`. The Service then round-robins to one of the two api pods. |
-| **(Bonus) How would you prove persistence to a skeptic?** | **Delete `postgres-0` while watching `kubectl get pods -w`; the StatefulSet recreates it within 20s. Then `kubectl exec postgres-0 -- psql -c "SELECT * FROM users"` returns the same rows** — proof that the PVC reattached, not a fresh volume. |
-| **(Bonus) Why "Off" update mode on the VPA?** | **Eviction of a singleton DB pod breaks readiness for the entire API tier.** See the report paragraph in Step 19. |
-
----
-
-### 🔹 STEP 20d — Fresh-cluster redeploy test (safety net, ~10 min)
+### Fresh-cluster redeploy test
 
 **What it does:** Deletes your namespace, re-runs the README from scratch, confirms everything comes back. This is **what the marker will do** — you want to catch any missing step *now*.
 
