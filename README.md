@@ -45,14 +45,14 @@
 ### Commands
 
 ```powershell
-# 20d-1. Delete everything you created
+# 1. Delete everything you created
 kubectl delete namespace usermgmt-02230125 --wait=true
 kubectl get namespaces | Select-String usermgmt   # should be empty
 
-# 20d-2. Follow the README step by step
-# (open README.md, execute commands verbatim, but SKIP steps 1–3 if you don't want to rebuild the cluster)
+# 2. Follow the README step by step
+# (open README.md, execute commands verbatim)
 
-# 20d-3. Once the README completes, verify everything
+# 3. Once the README completes, verify everything
 kubectl get all -n usermgmt-02230125
 kubectl get pvc,ingress,hpa,vpa -n usermgmt-02230125
 curl.exe http://usermgmt-02230125.local/users
