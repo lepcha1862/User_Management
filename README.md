@@ -40,9 +40,7 @@
 
 ### Fresh-cluster redeploy test
 
-**What it does:** Deletes your namespace, re-runs the README from scratch, confirms everything comes back. This is **what the marker will do** — you want to catch any missing step *now*.
-
-**Why needed:** Submitting with a broken README is the #1 cause of marks being lost in M6. This is the highest-value 10 minutes you can spend.
+**What it does:** Deletes your namespace, re-runs the README from scratch, confirms everything comes back.
 
 ### Commands
 
