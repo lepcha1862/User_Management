@@ -4,7 +4,7 @@
 
 ---
 
-### 🔹 STEP 20b — Report outline (≤8 pages PDF, M6's 0.25 marks)
+### Report outline
 
 **What it does:** Gives you the **exact section structure + screenshot assignments + word count** so the PDF writes itself. Just fill in the brackets with the screenshots you've been saving.
 
@@ -39,7 +39,7 @@
 
 ---
 
-### 🔹 STEP 20c — Demo Q&A crib sheet (M6's 0.5 marks)
+### Demo Q&A crib sheet
 
 **What it does:** Anticipates every question listed in the assignment and gives a concise answer. Memorize the bold line; the rest is context.
 
