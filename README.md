@@ -270,22 +270,3 @@ kubectl get pvc,ingress,hpa,vpa -n usermgmt-02230125; `
 curl.exe -s -i http://usermgmt-02230125.local/users
 ```
 ```
-
----
-
-### Save it
-
-```powershell
-cd "D:\Advanced System Administration\Assignment\User_Management"
-notepad REDEPLOY.md
-```
-
-Paste the block above into Notepad → Save. Then:
-
-```powershell
-Get-Content REDEPLOY.md | Measure-Object -Line
-```
-
----
-
-**Ready to resume the report?** Part 2 (M2 + M3) is queued — reply **"continue"** and I'll send it.
