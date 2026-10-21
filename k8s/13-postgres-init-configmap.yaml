@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+  namespace: usermgmt-02230125
+  labels:
+    app: postgres
+data:
+  init.sql: |
+    -- Runs only on first DB init (empty PGDATA). The Flask app also
+    -- creates this table at boot via ensure_table() in backend/app.py.
+    CREATE TABLE IF NOT EXISTS users (
+        id         SERIAL PRIMARY KEY,
+        name       TEXT NOT NULL,
+        email      TEXT UNIQUE NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
