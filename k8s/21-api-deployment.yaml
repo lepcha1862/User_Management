@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: usermgmt-api:1.0
+          image: usermgmt-api:1.2
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -59,3 +59,4 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 3
+

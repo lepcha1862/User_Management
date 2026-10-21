@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User Management · usermgmt-02230125</title>
+<style>
+  :root { --bg:#f5f7fa; --card:#fff; --border:#e2e8f0; --text:#1e293b;
+          --muted:#64748b; --primary:#2563eb; --primary-hover:#1d4ed8;
+          --danger:#dc2626; --success:#16a34a; --warn:#f59e0b; --grey:#94a3b8; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         background:var(--bg); color:var(--text); min-height:100vh; }
+  header { background:var(--card); border-bottom:1px solid var(--border);
+           padding:16px 24px; display:flex; align-items:center;
+           justify-content:space-between; box-shadow:0 1px 3px rgba(0,0,0,0.04);
+           flex-wrap:wrap; gap:12px; }
+  header h1 { margin:0; font-size:1.25rem; font-weight:600; }
+  .status-row { display:flex; gap:8px; font-size:0.8rem; }
+  .pill { padding:6px 12px; border-radius:999px; background:#e2e8f0;
+          color:var(--muted); font-weight:500; transition:all 0.2s;
+          white-space:nowrap; display:inline-flex; align-items:center; gap:6px; }
+  .pill::before { content:''; width:8px; height:8px; border-radius:50%;
+                  background:currentColor; opacity:0.5; }
+  .pill.ok  { background:#dcfce7; color:var(--success); }
+  .pill.ok::before  { opacity:1; }
+  .pill.bad { background:#fee2e2; color:var(--danger); }
+  .pill.bad::before { opacity:1; }
+  .pill.unknown { background:#f1f5f9; color:var(--grey); }
+  .pill.info { background:#dbeafe; color:var(--primary); }
+  .pill.info::before { opacity:1; }
+  .banner { max-width:960px; margin:16px auto 0; padding:12px 16px;
+            border-radius:8px; font-weight:500; display:none; }
+  .banner.warn { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
+  .banner.err  { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+  main { max-width:960px; margin:24px auto; padding:0 24px; display:grid; gap:24px; }
+  section { background:var(--card); border:1px solid var(--border);
+            border-radius:8px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+  section h2 { margin:0 0 16px; font-size:1rem; font-weight:600;
+               display:flex; justify-content:space-between; align-items:center; }
+  form { display:grid; grid-template-columns:1fr 1fr auto; gap:8px; }
+  @media (max-width:600px) { form { grid-template-columns:1fr; } }
+  input[type=text], input[type=email] { padding:10px 12px;
+    border:1px solid var(--border); border-radius:6px; font-size:0.9rem;
+    font-family:inherit; }
+  input:focus { outline:2px solid var(--primary); outline-offset:-1px; }
+  button { padding:10px 16px; border:none; border-radius:6px;
+           background:var(--primary); color:#fff; font-size:0.9rem;
+           font-weight:500; cursor:pointer; font-family:inherit;
+           transition:background 0.15s; }
+  button:hover:not(:disabled) { background:var(--primary-hover); }
+  button:disabled { background:var(--grey); cursor:not-allowed; }
+  button.secondary { background:transparent; color:var(--muted);
+                     border:1px solid var(--border); }
+  button.danger { background:transparent; color:var(--danger);
+                  border:1px solid var(--border); padding:6px 10px; font-size:0.8rem; }
+  button.edit-btn { background:transparent; color:var(--primary);
+                    border:1px solid var(--border); padding:6px 10px;
+                    font-size:0.8rem; margin-right:4px; }
+  .msg { margin-top:12px; padding:8px 12px; border-radius:6px;
+         font-size:0.85rem; display:none; }
+  .msg.ok  { background:#dcfce7; color:var(--success); display:block; }
+  .msg.err { background:#fee2e2; color:var(--danger);  display:block; }
+  table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+  th, td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--border); }
+  th { color:var(--muted); font-weight:500; font-size:0.8rem;
+       text-transform:uppercase; letter-spacing:0.03em; }
+  td.actions { text-align:right; white-space:nowrap; }
+  .empty { padding:24px; text-align:center; color:var(--muted); font-style:italic; }
+  .mono { font-family:ui-monospace,Menlo,monospace; font-size:0.85rem; color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>User Management · <span class="mono">usermgmt-02230125</span></h1>
+  <div class="status-row">
+    <span class="pill info" id="pill-fe">Frontend ✓</span>
+    <span class="pill unknown" id="pill-be">Backend ?</span>
+    <span class="pill unknown" id="pill-db">DB ?</span>
+  </div>
+</header>
+
+<div class="banner" id="banner"></div>
+
+<main>
+  <section>
+    <h2>Create user</h2>
+    <form id="create-form">
+      <input type="text"  name="name"  placeholder="Name"  required maxlength="200">
+      <input type="email" name="email" placeholder="Email" required maxlength="200">
+      <button type="submit" id="create-btn" disabled>Create</button>
+    </form>
+    <div class="msg" id="msg"></div>
+  </section>
+
+  <section>
+    <h2>Users <button type="button" class="secondary" id="refresh">↻ Refresh</button></h2>
+    <table>
+      <thead><tr><th style="width:60px;">ID</th><th>Name</th><th>Email</th>
+        <th>Created</th><th style="width:160px;"></th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="empty">Loading…</div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const tbody = $('tbody'), empty = $('empty'), msg = $('msg'), form = $('create-form');
+const pillFE = $('pill-fe'), pillBE = $('pill-be'), pillDB = $('pill-db');
+const banner = $('banner'), createBtn = $('create-btn');
+
+let lastState = { be: null, db: null };
+
+function showMsg(text, kind) {
+  msg.textContent = text; msg.className = 'msg ' + kind;
+  setTimeout(() => { msg.className = 'msg'; }, 4000);
+}
+
+function setPill(el, state, label) {
+  el.className = 'pill ' + state;
+  el.textContent = label;
+}
+
+async function checkStatus() {
+  let backendUp = false, dbUp = null, dbError = null;
+
+  try {
+    const r = await fetch('/healthz', { cache: 'no-store' });
+    backendUp = r.ok;
+  } catch (_) { backendUp = false; }
+
+  if (backendUp) {
+    try {
+      const r = await fetch('/ready', { cache: 'no-store' });
+      dbUp = r.ok;
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({}));
+        dbError = body.error || ('HTTP ' + r.status);
+      }
+    } catch (e) {
+      dbUp = false; dbError = e.message || 'network error';
+    }
+  }
+
+  setPill(pillBE, backendUp ? 'ok' : 'bad',
+          'Backend ' + (backendUp ? '✓' : '✗'));
+
+  if (!backendUp) {
+    setPill(pillDB, 'unknown', 'DB ?');
+    pillDB.title = 'Cannot check DB — backend is down';
+  } else if (dbUp) {
+    setPill(pillDB, 'ok', 'DB ✓');
+    pillDB.title = 'Database is reachable';
+  } else {
+    setPill(pillDB, 'bad', 'DB ✗');
+    pillDB.title = dbError || 'Database unreachable';
+  }
+
+  if (!backendUp) {
+    banner.className = 'banner err';
+    banner.innerHTML = '<strong>Backend API is offline.</strong> Frontend is still running. CRUD disabled until backend recovers.';
+    banner.style.display = 'block';
+  } else if (!dbUp) {
+    banner.className = 'banner warn';
+    banner.innerHTML = '<strong>Database unavailable.</strong> Backend is up, but cannot reach Postgres. CRUD will fail until DB recovers.';
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+
+  const fullStackUp = backendUp && dbUp;
+  createBtn.disabled = !fullStackUp;
+
+  if (fullStackUp && (lastState.be !== true || lastState.db !== true)) {
+    loadUsers();
+  }
+  lastState = { be: backendUp, db: dbUp };
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  let body = null;
+  try { body = await res.json(); } catch (_) {}
+  return { res, body };
+}
+
+async function loadUsers() {
+  try {
+    const { res, body } = await api('/users', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    tbody.innerHTML = '';
+    if (!body.length) {
+      empty.style.display = 'block';
+      empty.textContent = 'No users yet — create one above.';
+      return;
+    }
+    empty.style.display = 'none';
+    for (const u of body) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="mono">${u.id}</td>
+        <td>${escapeHtml(u.name)}</td>
+        <td>${escapeHtml(u.email)}</td>
+        <td class="mono">${new Date(u.created_at).toLocaleString()}</td>
+        <td class="actions">
+          <button class="edit-btn" data-id="${u.id}"
+                  data-name="${escapeAttr(u.name)}"
+                  data-email="${escapeAttr(u.email)}">Edit</button>
+          <button class="danger" data-id="${u.id}">Delete</button>
+        </td>`;
+      tbody.appendChild(tr);
+    }
+  } catch (e) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    empty.textContent = 'Backend unavailable — cannot load users.';
+  }
+}
+
+form.addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const data = Object.fromEntries(new FormData(form));
+  const { res, body } = await api('/users', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data),
+  });
+  if (res.status === 201) { form.reset(); showMsg('Created user #' + body.id, 'ok'); loadUsers(); }
+  else if (res.status === 409) showMsg('Email already exists.', 'err');
+  else showMsg('Create failed: ' + ((body && body.error) || res.status), 'err');
+});
+
+$('refresh').addEventListener('click', loadUsers);
+
+tbody.addEventListener('click', async (ev) => {
+  const btn = ev.target.closest('button'); if (!btn) return;
+  if (btn.classList.contains('danger')) {
+    const id = btn.dataset.id;
+    if (!confirm('Delete user #' + id + '?')) return;
+    const { res } = await api('/users/' + id, { method: 'DELETE' });
+    if (res.ok) { showMsg('Deleted user #' + id, 'ok'); loadUsers(); }
+    else showMsg('Delete failed', 'err');
+  }
+  if (btn.classList.contains('edit-btn')) {
+    const id = btn.dataset.id;
+    const name = prompt('New name:', btn.dataset.name); if (name === null) return;
+    const email = prompt('New email:', btn.dataset.email); if (email === null) return;
+    const { res, body } = await api('/users/' + id, {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, email }),
+    });
+    if (res.ok) { showMsg('Updated user #' + id, 'ok'); loadUsers(); }
+    else showMsg('Update failed: ' + ((body && body.error) || res.status), 'err');
+  }
+});
+
+checkStatus();
+setInterval(checkStatus, 5000);
+</script>
+</body>
+</html>

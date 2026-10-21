@@ -40,9 +40,9 @@ def ensure_table(retries=10):
             print("ensure_table: OK", flush=True)
             return
         except Exception as e:
-            print(f"ensure_table attempt {i+1}/{retries} failed: {e}", flush=True)
+            print("ensure_table attempt %d/%d failed: %s" % (i+1, retries, e), flush=True)
             time.sleep(2)
-    print("ensure_table: giving up (table may already exist)", flush=True)
+    print("ensure_table: giving up", flush=True)
 
 @app.get("/healthz")
 def healthz():
