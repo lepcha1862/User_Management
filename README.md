@@ -610,7 +610,7 @@ kubectl get vpa -n usermgmt-02230125
 
 ## Step 7: Test the Application Again
 
-# Browser test
+### Browser test
 ``` Tests: Frontend tier (nginx) + Ingress / rule
 http://usermgmt-02230125.local/
 ```
@@ -624,7 +624,7 @@ http://usermgmt-02230125.local/healthz
 http://usermgmt-02230125.local/ready
 ```
 
-# In Terminal
+### In Terminal
 ```powershell
 curl.exe -i http://usermgmt-02230125.local/
 curl.exe -i http://usermgmt-02230125.local/users
