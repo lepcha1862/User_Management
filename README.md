@@ -150,7 +150,7 @@ The PostgreSQL initialization ConfigMap is optional if the project does not use 
 Navigate to the backend API directory containing its Dockerfile.
 
 ```powershell
-docker build -t usermgmt-api:1.3 .
+docker build -t usermgmt-api:1.3 ./backend
 ```
 
 If the backend is in a subdirectory, navigate there before running the command or specify the correct build context.
