@@ -535,26 +535,26 @@ For a routine application update, prefer applying the updated manifests without 
 Apply the namespace.
 
 ```powershell
-kubectl apply -f 00-namespace.yaml
+kubectl apply -f k8s/00-namespace.yaml
 ```
 
 Apply the database resources.
 
 ```powershell
-kubectl apply -f 10-postgres-secret.yaml
-kubectl apply -f 11-postgres-headless-service.yaml
+kubectl apply -f k8s/10-postgres-secret.yaml
+kubectl apply -f k8s/11-postgres-headless-service.yaml
 ```
 
 If used, apply the database initialization ConfigMap at the appropriate point.
 
 ```powershell
-kubectl apply -f 13-postgres-init-configmap.yaml
+kubectl apply -f k8s/13-postgres-init-configmap.yaml
 ```
 
 Apply the PostgreSQL StatefulSet.
 
 ```powershell
-kubectl apply -f 12-postgres-statefulset.yaml
+kubectl apply -f k8s/12-postgres-statefulset.yaml
 ```
 
 Wait for PostgreSQL.
@@ -566,24 +566,24 @@ kubectl rollout status statefulset/postgres -n usermgmt-02230125 --timeout=180s
 Apply the API resources.
 
 ```powershell
-kubectl apply -f 20-api-configmap.yaml
-kubectl apply -f 21-api-deployment.yaml
-kubectl apply -f 22-api-service.yaml
+kubectl apply -f k8s/20-api-configmap.yaml
+kubectl apply -f k8s/21-api-deployment.yaml
+kubectl apply -f k8s/22-api-service.yaml
 ```
 
 Apply the frontend resources.
 
 ```powershell
-kubectl apply -f 30-frontend-deployment.yaml
-kubectl apply -f 31-frontend-service.yaml
+kubectl apply -f k8s/30-frontend-deployment.yaml
+kubectl apply -f k8s/31-frontend-service.yaml
 ```
 
 Apply Ingress and autoscaling resources.
 
 ```powershell
-kubectl apply -f 40-ingress.yaml
-kubectl apply -f 50-api-hpa.yaml
-kubectl apply -f 51-postgres-vpa.yaml
+kubectl apply -f k8s/40-ingress.yaml
+kubectl apply -f k8s/50-api-hpa.yaml
+kubectl apply -f k8s/51-postgres-vpa.yaml
 ```
 
 Use only the manifest files that exist in the project.
@@ -610,6 +610,21 @@ kubectl get vpa -n usermgmt-02230125
 
 ## Step 7: Test the Application Again
 
+# Browser test
+``` Tests: Frontend tier (nginx) + Ingress / rule
+http://usermgmt-02230125.local/
+```
+```Tests: Backend tier (Flask) + Ingress /users rule
+http://usermgmt-02230125.local/users
+```
+```Tests: Backend liveness
+http://usermgmt-02230125.local/healthz
+```
+```Tests: Backend → DB connection (the three-tier link)
+http://usermgmt-02230125.local/ready
+```
+
+# In Terminal
 ```powershell
 curl.exe -i http://usermgmt-02230125.local/
 curl.exe -i http://usermgmt-02230125.local/users
@@ -907,16 +922,16 @@ hey -version
 
 If the command is unavailable, install `hey` using the appropriate installation instructions for your operating system.
 
-Run a three-minute test with 50 concurrent workers.
+Run a 60s test with 50 concurrent workers.
 
 ```powershell
-hey -z 3m -c 50 http://usermgmt-02230125.local/users
+hey -z 60s -c 50 http://usermgmt-02230125.local/users
 ```
 
 For a heavier test, run:
 
 ```powershell
-hey -z 3m -c 200 http://usermgmt-02230125.local/users
+hey -z 60s -c 200 http://usermgmt-02230125.local/users
 ```
 
 Run only one test at a time if you want clearer measurements.
@@ -983,14 +998,14 @@ The API should continue to operate independently of the frontend, assuming its d
 Restore the frontend.
 
 ```powershell
-kubectl apply -f 30-frontend-deployment.yaml
+kubectl apply -f k8s/30-frontend-deployment.yaml
 kubectl rollout status deployment/frontend -n usermgmt-02230125 --timeout=180s
 ```
 
 Reapply its Service if required.
 
 ```powershell
-kubectl apply -f 31-frontend-service.yaml
+kubectl apply -f k8s/31-frontend-service.yaml
 ```
 
 Verify the frontend.
@@ -1031,9 +1046,9 @@ The frontend static page may still load, but operations requiring the API may fa
 Restore the API.
 
 ```powershell
-kubectl apply -f 20-api-configmap.yaml
-kubectl apply -f 21-api-deployment.yaml
-kubectl apply -f 22-api-service.yaml
+kubectl apply -f k8s/20-api-configmap.yaml
+kubectl apply -f k8s/21-api-deployment.yaml
+kubectl apply -f k8s/22-api-service.yaml
 ```
 
 Wait for recovery.
