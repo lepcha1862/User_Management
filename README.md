@@ -204,7 +204,7 @@ Minikube runs its own container environment. Loading locally built images makes 
 Apply the namespace manifest.
 
 ```powershell
-kubectl apply -f 00-namespace.yaml
+kubectl apply -f k8s/00-namespace.yaml
 ```
 
 Verify the namespace.
@@ -219,25 +219,25 @@ kubectl get namespace usermgmt-02230125
 Apply the PostgreSQL Secret.
 
 ```powershell
-kubectl apply -f 10-postgres-secret.yaml
+kubectl apply -f k8s/10-postgres-secret.yaml
 ```
 
 Create the headless Service.
 
 ```powershell
-kubectl apply -f 11-postgres-headless-service.yaml
+kubectl apply -f k8s/11-postgres-headless-service.yaml
 ```
 
 Apply the StatefulSet.
 
 ```powershell
-kubectl apply -f 12-postgres-statefulset.yaml
+kubectl apply -f k8s/12-postgres-statefulset.yaml
 ```
 
 If the project uses the initialization ConfigMap, apply it before the StatefulSet when required by its configuration.
 
 ```powershell
-kubectl apply -f 13-postgres-init-configmap.yaml
+kubectl apply -f k8s/13-postgres-init-configmap.yaml
 ```
 
 Check the database resources.
@@ -268,19 +268,19 @@ kubectl get pod postgres-0 -n usermgmt-02230125
 Apply the API configuration.
 
 ```powershell
-kubectl apply -f 20-api-configmap.yaml
+kubectl apply -f k8s/20-api-configmap.yaml
 ```
 
 Deploy the API.
 
 ```powershell
-kubectl apply -f 21-api-deployment.yaml
+kubectl apply -f k8s/21-api-deployment.yaml
 ```
 
 Create the API Service.
 
 ```powershell
-kubectl apply -f 22-api-service.yaml
+kubectl apply -f k8s/22-api-service.yaml
 ```
 
 Wait for the API rollout.
@@ -308,13 +308,13 @@ kubectl logs deployment/api -n usermgmt-02230125
 Apply the frontend Deployment.
 
 ```powershell
-kubectl apply -f 30-frontend-deployment.yaml
+kubectl apply -f k8s/30-frontend-deployment.yaml
 ```
 
 Create the frontend Service.
 
 ```powershell
-kubectl apply -f 31-frontend-service.yaml
+kubectl apply -f k8s/31-frontend-service.yaml
 ```
 
 Wait for the rollout.
@@ -336,7 +336,7 @@ kubectl get service frontend -n usermgmt-02230125
 Apply the Ingress manifest.
 
 ```powershell
-kubectl apply -f 40-ingress.yaml
+kubectl apply -f k8s/40-ingress.yaml
 ```
 
 Check the Ingress.
@@ -353,7 +353,7 @@ Confirm that the hostname and paths match the actual Ingress manifest.
 Apply the Horizontal Pod Autoscaler.
 
 ```powershell
-kubectl apply -f 50-api-hpa.yaml
+kubectl apply -f k8s/50-api-hpa.yaml
 ```
 
 Check its configuration.
@@ -376,7 +376,7 @@ HPA requires working resource requests and a functioning Metrics Server.
 Apply the PostgreSQL VPA manifest.
 
 ```powershell
-kubectl apply -f 51-postgres-vpa.yaml
+kubectl apply -f k8s/51-postgres-vpa.yaml
 ```
 
 Check the VPA.
