@@ -166,7 +166,7 @@ docker images
 Navigate to the frontend directory containing its Dockerfile.
 
 ```powershell
-docker build -t usermgmt-frontend:1.0 .
+docker build -t usermgmt-frontend:1.0 ./frontend
 ```
 
 Verify both application images.
